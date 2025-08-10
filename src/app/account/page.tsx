@@ -32,13 +32,40 @@ const AccountPage = () => {
   // Reset password state
   const [resetEmail, setResetEmail] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login:', loginData);
-    // Ici vous ajouteriez la logique d'authentification
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Connexion réussie
+        alert('Connexion réussie !');
+        
+        // Rediriger vers /admin si c'est un opticien
+        if (data.data.isOptician) {
+          window.location.href = '/admin';
+        } else {
+          window.location.href = '/';
+        }
+      } else {
+        alert('Erreur de connexion: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la connexion:', error);
+      alert('Erreur lors de la connexion');
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (registerData.password !== registerData.confirmPassword) {
       alert('Les mots de passe ne correspondent pas');
@@ -48,8 +75,42 @@ const AccountPage = () => {
       alert('Veuillez accepter la politique de confidentialité');
       return;
     }
-    console.log('Register:', registerData);
-    // Ici vous ajouteriez la logique d'inscription
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registerData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
+        // Vider le formulaire d'inscription
+        setRegisterData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: '',
+          confirmPassword: '',
+          birthday: '',
+          gender: '',
+          isOptician: false,
+          newsletterSubscribed: false,
+          acceptPrivacy: false
+        });
+        // Basculer vers le formulaire de connexion
+        setShowLogin(true);
+      } else {
+        alert('Erreur lors de la création du compte: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'inscription:', error);
+      alert('Erreur lors de la création du compte');
+    }
   };
 
   const handleResetPassword = (e: React.FormEvent) => {

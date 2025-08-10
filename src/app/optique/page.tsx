@@ -1,134 +1,32 @@
 'use client';
 
-import { useState } from 'react';
-import ProductCard from '@/components/ProductCard';
-import { ChevronDown, Filter, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { 
+  Search, 
+  Filter, 
+  ChevronDown,
+  X,
+  Package,
+  Eye
+} from 'lucide-react';
 
-// Données d'exemple pour les produits optiques
-const sampleProducts = [
-  {
-    id: 'opt1',
-    name: 'NOLAN',
-    model: 'GS7002_23_NOLAN_2',
-    price: 0,
-    images: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '55',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'optique' as const,
-    availableInOptical: true,
-    shape: 'carrée' as const,
-    color: 'noir',
-    gender: 'homme' as const
-  },
-  {
-    id: 'opt2',
-    name: 'ZAC',
-    model: 'GS7006_30_ZAC_2',
-    price: 0,
-    images: ['https://images.unsplash.com/photo-1574258495973-f010dfbb5371?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80'],
-    size: '52',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'optique' as const,
-    availableInOptical: true,
-    shape: 'ronde' as const,
-    color: 'havana',
-    gender: 'mixte' as const
-  },
-  {
-    id: 'opt3',
-    name: 'BREN',
-    model: 'GS7008_40_BREN_2',
-    price: 0,
-    images: ['https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80'],
-    size: '54',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'optique' as const,
-    availableInOptical: true,
-    shape: 'géométrique' as const,
-    color: 'marron',
-    gender: 'femme' as const
-  },
-  {
-    id: 'opt4',
-    name: 'LAB VISION',
-    model: 'LB001_BK',
-    price: 0,
-    images: ['https://images.unsplash.com/photo-1622445275576-721325763afe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '53',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'optique' as const,
-    availableInOptical: true,
-    isNew: true,
-    shape: 'cat-eye' as const,
-    color: 'noir',
-    gender: 'femme' as const
-  },
-  {
-    id: 'opt5',
-    name: 'ICONS CLASSIC',
-    model: 'IC005_HV',
-    price: 0,
-    images: ['https://images.unsplash.com/photo-1609343516484-d36e4b7e7fb5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '56',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'optique' as const,
-    availableInOptical: true,
-    shape: 'aviateur' as const,
-    color: 'havana',
-    gender: 'homme' as const
-  },
-  {
-    id: 'opt6',
-    name: 'VANGUARD OPTICAL',
-    model: 'VG010_GR',
-    price: 0,
-    images: ['https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '51',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'optique' as const,
-    availableInOptical: true,
-    shape: 'ronde' as const,
-    color: 'vert',
-    gender: 'mixte' as const
-  },
-  {
-    id: 'opt7',
-    name: 'CLARITY',
-    model: 'CL007_BL',
-    price: 0,
-    images: ['https://images.unsplash.com/photo-1519144677906-2b171e70e6bb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '54',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'optique' as const,
-    availableInOptical: true,
-    shape: 'carrée' as const,
-    color: 'bleu',
-    gender: 'mixte' as const,
-    isNew: true
-  },
-  {
-    id: 'opt8',
-    name: 'MINIMAL',
-    model: 'MIN008_MT',
-    price: 0,
-    images: ['https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '50',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'optique' as const,
-    availableInOptical: true,
-    shape: 'ronde' as const,
-    color: 'métal',
-    gender: 'femme' as const
-  }
-];
+interface Product {
+  _id: string;
+  name: string;
+  model: string;
+  category: 'solaire' | 'optique';
+  gender: 'femme' | 'homme' | 'mixte';
+  shape: string;
+  color: string;
+  size: string;
+  fit: string;
+  availableInOptical: boolean;
+  images: string[];
+  stock: number;
+  isNew: boolean;
+}
 
 const filters = {
   gender: ['Femme', 'Homme', 'Mixte'],
@@ -137,12 +35,60 @@ const filters = {
   collection: ['VANGUARD Collection', 'LAB Collection', 'ICONS Collection', 'XS Collection', 'MEN Collection']
 };
 
-const OptiquePage = () => {
+export default function OptiquePage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<{[key: string]: string[]}>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortBy, setSortBy] = useState('nouveautés');
-  const [cart, setCart] = useState<string[]>([]);
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    loadProducts();
+  }, [searchTerm, activeFilters, sortBy, sortOrder, currentPage]);
+
+  const loadProducts = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '12',
+        sortBy,
+        sortOrder,
+        category: 'optique' // Uniquement les lunettes optiques
+      });
+
+      if (searchTerm) params.append('search', searchTerm);
+      
+      // Ajouter les filtres actifs
+      Object.entries(activeFilters).forEach(([category, values]) => {
+        values.forEach(value => {
+          if (category === 'gender') {
+            params.append('gender', value.toLowerCase());
+          } else if (category === 'color') {
+            params.append('color', value.toLowerCase());
+          }
+        });
+      });
+
+      const response = await fetch(`/api/products?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setProducts(data.data);
+        setTotalPages(data.pagination.totalPages);
+      } else {
+        console.error('Erreur lors du chargement des produits:', data.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des produits:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFilterChange = (category: string, value: string) => {
     setActiveFilters(prev => {
@@ -155,6 +101,7 @@ const OptiquePage = () => {
         ? { ...prev, [category]: updated }
         : { ...prev, [category]: [] };
     });
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
   const removeFilter = (category: string, value: string) => {
@@ -166,36 +113,12 @@ const OptiquePage = () => {
 
   const clearAllFilters = () => {
     setActiveFilters({});
+    setCurrentPage(1);
   };
 
   const getActiveFilterCount = () => {
     return Object.values(activeFilters).flat().length;
   };
-
-  const handleAddToCart = (productId: string) => {
-    setCart(prev => [...prev, productId]);
-  };
-
-  const handleToggleFavorite = (productId: string) => {
-    setFavorites(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    );
-  };
-
-  // Filtrer les produits selon les filtres actifs
-  const filteredProducts = sampleProducts.filter(product => {
-    const genderFilter = activeFilters.gender || [];
-    const shapeFilter = activeFilters.shape || [];
-    const colorFilter = activeFilters.color || [];
-
-    return (
-      (genderFilter.length === 0 || genderFilter.some(f => f.toLowerCase() === product.gender)) &&
-      (shapeFilter.length === 0 || shapeFilter.some(f => f.toLowerCase().replace('-', '') === product.shape.replace('-', ''))) &&
-      (colorFilter.length === 0 || colorFilter.some(f => f.toLowerCase() === product.color))
-    );
-  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -343,51 +266,169 @@ const OptiquePage = () => {
 
         {/* Main content */}
         <main className="flex-1">
-          {/* Sort and results header */}
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-gray-600">
-              {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''}
-            </p>
-            
-            <div className="flex items-center space-x-2">
-              <span className="text-sm">Trier par:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="border border-gray-300 rounded px-3 py-1 text-sm"
-              >
-                <option value="nouveautés">Nouveautés</option>
-                <option value="nom">Nom A-Z</option>
-                <option value="popularité">Popularité</option>
-              </select>
+          {/* Search and sort header */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
+            {/* Search */}
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Rechercher une monture..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+              />
+            </div>
+
+            {/* Results count and sort */}
+            <div className="flex items-center space-x-4">
+              <p className="text-gray-600">
+                {products.length} produit{products.length > 1 ? 's' : ''}
+              </p>
+              
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">Trier par:</span>
+                <select
+                  value={`${sortBy}-${sortOrder}`}
+                  onChange={(e) => {
+                    const [field, order] = e.target.value.split('-');
+                    setSortBy(field);
+                    setSortOrder(order);
+                  }}
+                  className="border border-gray-300 rounded px-3 py-1 text-sm"
+                >
+                  <option value="createdAt-desc">Nouveautés</option>
+                  <option value="name-asc">Nom A-Z</option>
+                  <option value="name-desc">Nom Z-A</option>
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Products grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                {...product}
-                onAddToCart={handleAddToCart}
-                onToggleFavorite={handleToggleFavorite}
-                isFavorite={favorites.includes(product.id)}
-              />
-            ))}
-          </div>
-
-          {/* No results */}
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-16">
-              <h3 className="text-xl font-semibold mb-2">Aucun produit trouvé</h3>
-              <p className="text-gray-600 mb-4">
-                Essayez de modifier vos filtres pour voir plus de produits.
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 rounded-lg h-64 mb-4"></div>
+                  <div className="bg-gray-200 h-4 rounded mb-2"></div>
+                  <div className="bg-gray-200 h-4 rounded w-2/3"></div>
+                </div>
+              ))}
+            </div>
+          ) : products.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+              <Package size={48} className="text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun produit trouvé</h3>
+              <p className="text-gray-600 mb-6">
+                Aucune monture ne correspond à vos critères de recherche.
               </p>
               <button
                 onClick={clearAllFilters}
                 className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800"
               >
                 Effacer tous les filtres
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {products.map((product) => (
+                <div key={product._id} className="group relative">
+                  <Link href={`/products/${product._id}`}>
+                    <div className="relative aspect-square mb-4 overflow-hidden bg-gray-100 rounded-lg">
+                      <Image
+                        src={product.images[0] || '/placeholder-glasses.jpg'}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+
+                      {/* Badges */}
+                      <div className="absolute top-3 left-3 flex flex-col space-y-2">
+                        {product.isNew && (
+                          <span className="bg-black text-white text-xs px-2 py-1 rounded">
+                            NOUVEAU
+                          </span>
+                        )}
+                        <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                          DISPONIBLE EN OPTIQUE
+                        </span>
+                      </div>
+
+                      {/* View button */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.href = `/products/${product._id}`;
+                        }}
+                        className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-blue-700"
+                      >
+                        <Eye size={16} />
+                        <span className="text-sm">Voir le produit</span>
+                      </button>
+                    </div>
+
+                    {/* Product info */}
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-lg group-hover:text-gray-600 transition-colors">
+                        {product.name}
+                      </h3>
+                      
+                      <p className="text-gray-600 text-sm">{product.model}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-blue-600 font-medium">Disponible en optique</span>
+                        <span className={`text-sm px-2 py-1 rounded ${
+                          product.stock > 5 ? 'bg-green-100 text-green-800' :
+                          product.stock > 0 ? 'bg-orange-100 text-orange-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {product.stock > 0 ? 'En stock' : 'Rupture'}
+                        </span>
+                      </div>
+
+                      <div className="text-sm text-gray-500">
+                        <p>{product.size} / {product.fit}</p>
+                        <p className="capitalize">{product.gender} • {product.color}</p>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center space-x-2 mt-12">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Précédent
+              </button>
+              
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-4 py-2 border rounded-lg ${
+                    currentPage === page
+                      ? 'bg-black text-white border-black'
+                      : 'border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Suivant
               </button>
             </div>
           )}
@@ -407,6 +448,4 @@ const OptiquePage = () => {
       </div>
     </div>
   );
-};
-
-export default OptiquePage;
+}

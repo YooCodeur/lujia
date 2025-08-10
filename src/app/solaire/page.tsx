@@ -1,140 +1,34 @@
 'use client';
 
-import { useState } from 'react';
-import ProductCard from '@/components/ProductCard';
-import { ChevronDown, Filter, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { 
+  Search, 
+  Filter, 
+  ChevronDown,
+  X,
+  Package,
+  Heart,
+  ShoppingBag
+} from 'lucide-react';
 
-// Données d'exemple pour les produits solaires
-const sampleProducts = [
-  {
-    id: '1',
-    name: 'ABYSS',
-    model: 'GS3001_30_2',
-    price: 229,
-    images: ['https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '53',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'solaire' as const,
-    isNew: true,
-    shape: 'ronde' as const,
-    color: 'noir',
-    gender: 'mixte' as const
-  },
-  {
-    id: '2',
-    name: 'ETHEREA',
-    model: 'GS3002_23_2',
-    price: 229,
-    images: ['https://images.unsplash.com/photo-1511499767150-a48a237f0083?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80'],
-    size: '55',
-    fit: 'Regular Fit',
-    polarized: true,
-    category: 'solaire' as const,
-    shape: 'carrée' as const,
-    color: 'havana',
-    gender: 'femme' as const
-  },
-  {
-    id: '3',
-    name: 'SHIMMER',
-    model: 'GS3003_50_2',
-    price: 229,
-    images: ['https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80'],
-    size: '51',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'solaire' as const,
-    shape: 'cat-eye' as const,
-    color: 'rose',
-    gender: 'femme' as const
-  },
-  {
-    id: '4',
-    name: 'VANGUARD CLASSIC',
-    model: 'VG001_BK',
-    price: 245,
-    images: ['https://images.unsplash.com/photo-1508296695146-257a814070b4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '54',
-    fit: 'Regular Fit',
-    polarized: true,
-    category: 'solaire' as const,
-    shape: 'pilote' as const,
-    color: 'noir',
-    gender: 'homme' as const
-  },
-  {
-    id: '5',
-    name: 'ICONS RETRO',
-    model: 'IC002_HV',
-    price: 215,
-    images: ['https://images.unsplash.com/photo-1577803645773-f96470509666?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '52',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'solaire' as const,
-    shape: 'géométrique' as const,
-    color: 'havana',
-    gender: 'mixte' as const
-  },
-  {
-    id: '6',
-    name: 'XS COMPACT',
-    model: 'XS003_GR',
-    price: 199,
-    images: ['https://images.unsplash.com/photo-1556306535-0f09a537f0a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '48',
-    fit: 'Compact Fit',
-    polarized: true,
-    category: 'solaire' as const,
-    shape: 'ronde' as const,
-    color: 'vert',
-    gender: 'mixte' as const
-  },
-  {
-    id: '7',
-    name: 'AURORA',
-    model: 'AR004_RG',
-    price: 259,
-    images: ['https://images.unsplash.com/photo-1544966503-7cc61b6e2099?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '56',
-    fit: 'Large Fit',
-    polarized: true,
-    category: 'solaire' as const,
-    shape: 'carrée' as const,
-    color: 'rose',
-    gender: 'femme' as const,
-    isNew: true
-  },
-  {
-    id: '8',
-    name: 'TITANIUM',
-    model: 'TI005_MT',
-    price: 289,
-    images: ['https://images.unsplash.com/photo-1517091043640-2e14e4175134?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '52',
-    fit: 'Regular Fit',
-    polarized: true,
-    category: 'solaire' as const,
-    shape: 'ronde' as const,
-    color: 'métal',
-    gender: 'homme' as const
-  },
-  {
-    id: '9',
-    name: 'CRYSTAL',
-    model: 'CR006_CL',
-    price: 199,
-    images: ['https://images.unsplash.com/photo-1585034946026-8715895c7d73?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'],
-    size: '50',
-    fit: 'Regular Fit',
-    polarized: false,
-    category: 'solaire' as const,
-    shape: 'cat-eye' as const,
-    color: 'transparent',
-    gender: 'femme' as const
-  }
-];
+interface Product {
+  _id: string;
+  name: string;
+  model: string;
+  price: number;
+  category: 'solaire' | 'optique';
+  gender: 'femme' | 'homme' | 'mixte';
+  shape: string;
+  color: string;
+  size: string;
+  fit: string;
+  polarized: boolean;
+  images: string[];
+  stock: number;
+  isNew: boolean;
+}
 
 const filters = {
   gender: ['Femme', 'Homme', 'Mixte'],
@@ -144,12 +38,63 @@ const filters = {
   polarized: ['Polarisants', 'Non Polarisants']
 };
 
-const SolairePage = () => {
+export default function SolairePage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeFilters, setActiveFilters] = useState<{[key: string]: string[]}>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortBy, setSortBy] = useState('nouveautés');
-  const [cart, setCart] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [favorites, setFavorites] = useState<string[]>([]);
+
+  useEffect(() => {
+    loadProducts();
+  }, [searchTerm, activeFilters, sortBy, sortOrder, currentPage]);
+
+  const loadProducts = async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: '12',
+        sortBy,
+        sortOrder,
+        category: 'solaire' // Uniquement les lunettes de soleil
+      });
+
+      if (searchTerm) params.append('search', searchTerm);
+      
+      // Ajouter les filtres actifs
+      Object.entries(activeFilters).forEach(([category, values]) => {
+        values.forEach(value => {
+          if (category === 'gender') {
+            params.append('gender', value.toLowerCase());
+          } else if (category === 'polarized') {
+            params.append('polarized', value === 'Polarisants' ? 'true' : 'false');
+          } else if (category === 'color') {
+            params.append('color', value.toLowerCase());
+          }
+        });
+      });
+
+      const response = await fetch(`/api/products?${params}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setProducts(data.data);
+        setTotalPages(data.pagination.totalPages);
+      } else {
+        console.error('Erreur lors du chargement des produits:', data.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des produits:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFilterChange = (category: string, value: string) => {
     setActiveFilters(prev => {
@@ -162,6 +107,7 @@ const SolairePage = () => {
         ? { ...prev, [category]: updated }
         : { ...prev, [category]: [] };
     });
+    setCurrentPage(1); // Reset to first page when filtering
   };
 
   const removeFilter = (category: string, value: string) => {
@@ -173,14 +119,47 @@ const SolairePage = () => {
 
   const clearAllFilters = () => {
     setActiveFilters({});
+    setCurrentPage(1);
   };
 
   const getActiveFilterCount = () => {
     return Object.values(activeFilters).flat().length;
   };
 
-  const handleAddToCart = (productId: string) => {
-    setCart(prev => [...prev, productId]);
+  const handleAddToCart = async (productId: string) => {
+    try {
+      // Générer un sessionId pour les utilisateurs non connectés
+      const sessionId = localStorage.getItem('sessionId') || generateSessionId();
+      localStorage.setItem('sessionId', sessionId);
+
+      const response = await fetch('/api/cart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': sessionId
+        },
+        body: JSON.stringify({
+          productId,
+          quantity: 1
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const product = products.find(p => p._id === productId);
+        alert(`${product?.name} ajouté au panier !`);
+      } else {
+        alert('Erreur lors de l\'ajout au panier: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout au panier:', error);
+      alert('Erreur lors de l\'ajout au panier');
+    }
+  };
+
+  const generateSessionId = () => {
+    return 'session_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
   };
 
   const handleToggleFavorite = (productId: string) => {
@@ -190,23 +169,6 @@ const SolairePage = () => {
         : [...prev, productId]
     );
   };
-
-  // Filtrer les produits selon les filtres actifs
-  const filteredProducts = sampleProducts.filter(product => {
-    const genderFilter = activeFilters.gender || [];
-    const shapeFilter = activeFilters.shape || [];
-    const colorFilter = activeFilters.color || [];
-    const polarizedFilter = activeFilters.polarized || [];
-
-    return (
-      (genderFilter.length === 0 || genderFilter.some(f => f.toLowerCase() === product.gender)) &&
-      (shapeFilter.length === 0 || shapeFilter.some(f => f.toLowerCase().replace(' ', '-') === product.shape)) &&
-      (colorFilter.length === 0 || colorFilter.some(f => f.toLowerCase() === product.color)) &&
-      (polarizedFilter.length === 0 || 
-        (polarizedFilter.includes('Polarisants') && product.polarized) ||
-        (polarizedFilter.includes('Non Polarisants') && !product.polarized))
-    );
-  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -345,46 +307,63 @@ const SolairePage = () => {
 
         {/* Main content */}
         <main className="flex-1">
-          {/* Sort and results header */}
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-gray-600">
-              {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''}
-            </p>
-            
-            <div className="flex items-center space-x-2">
-              <span className="text-sm">Trier par:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="border border-gray-300 rounded px-3 py-1 text-sm"
-              >
-                <option value="nouveautés">Nouveautés</option>
-                <option value="prix-croissant">Prix croissant</option>
-                <option value="prix-décroissant">Prix décroissant</option>
-                <option value="nom">Nom A-Z</option>
-              </select>
+          {/* Search and sort header */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 space-y-4 md:space-y-0">
+            {/* Search */}
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Rechercher un produit..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+              />
+            </div>
+
+            {/* Results count and sort */}
+            <div className="flex items-center space-x-4">
+              <p className="text-gray-600">
+                {products.length} produit{products.length > 1 ? 's' : ''}
+              </p>
+              
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">Trier par:</span>
+                <select
+                  value={`${sortBy}-${sortOrder}`}
+                  onChange={(e) => {
+                    const [field, order] = e.target.value.split('-');
+                    setSortBy(field);
+                    setSortOrder(order);
+                  }}
+                  className="border border-gray-300 rounded px-3 py-1 text-sm"
+                >
+                  <option value="createdAt-desc">Nouveautés</option>
+                  <option value="price-asc">Prix croissant</option>
+                  <option value="price-desc">Prix décroissant</option>
+                  <option value="name-asc">Nom A-Z</option>
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Products grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                {...product}
-                onAddToCart={handleAddToCart}
-                onToggleFavorite={handleToggleFavorite}
-                isFavorite={favorites.includes(product.id)}
-              />
-            ))}
-          </div>
-
-          {/* No results */}
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-16">
-              <h3 className="text-xl font-semibold mb-2">Aucun produit trouvé</h3>
-              <p className="text-gray-600 mb-4">
-                Essayez de modifier vos filtres pour voir plus de produits.
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 rounded-lg h-64 mb-4"></div>
+                  <div className="bg-gray-200 h-4 rounded mb-2"></div>
+                  <div className="bg-gray-200 h-4 rounded w-2/3"></div>
+                </div>
+              ))}
+            </div>
+          ) : products.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+              <Package size={48} className="text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun produit trouvé</h3>
+              <p className="text-gray-600 mb-6">
+                Aucun produit ne correspond à vos critères de recherche.
               </p>
               <button
                 onClick={clearAllFilters}
@@ -393,11 +372,128 @@ const SolairePage = () => {
                 Effacer tous les filtres
               </button>
             </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {products.map((product) => (
+                <div key={product._id} className="group relative">
+                  <Link href={`/products/${product._id}`}>
+                    <div className="relative aspect-square mb-4 overflow-hidden bg-gray-100 rounded-lg">
+                      <Image
+                        src={product.images[0] || '/placeholder-glasses.jpg'}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+
+                      {/* Badges */}
+                      <div className="absolute top-3 left-3 flex flex-col space-y-2">
+                        {product.isNew && (
+                          <span className="bg-black text-white text-xs px-2 py-1 rounded">
+                            NOUVEAU
+                          </span>
+                        )}
+                        {product.polarized && (
+                          <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                            POLARISÉ
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Favorite button */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleToggleFavorite(product._id);
+                        }}
+                        className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      >
+                        <Heart 
+                          size={16} 
+                          className={favorites.includes(product._id) ? 'fill-red-500 text-red-500' : 'text-gray-600'}
+                        />
+                      </button>
+
+                      {/* Quick add to cart button */}
+                      {product.stock > 0 && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleAddToCart(product._id);
+                          }}
+                          className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-full flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-gray-800"
+                        >
+                          <ShoppingBag size={16} />
+                          <span className="text-sm">Ajouter au panier</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Product info */}
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-lg group-hover:text-gray-600 transition-colors">
+                        {product.name}
+                      </h3>
+                      
+                      <p className="text-gray-600 text-sm">{product.model}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-lg">{product.price}€</span>
+                        <span className={`text-sm px-2 py-1 rounded ${
+                          product.stock > 5 ? 'bg-green-100 text-green-800' :
+                          product.stock > 0 ? 'bg-orange-100 text-orange-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {product.stock > 0 ? 'En stock' : 'Rupture'}
+                        </span>
+                      </div>
+
+                      <div className="text-sm text-gray-500">
+                        <p>{product.size} / {product.fit} / {product.polarized ? 'POLARISANTS' : 'NON POLARISANTS'}</p>
+                        <p className="capitalize">{product.gender} • {product.color}</p>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center space-x-2 mt-12">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Précédent
+              </button>
+              
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-4 py-2 border rounded-lg ${
+                    currentPage === page
+                      ? 'bg-black text-white border-black'
+                      : 'border-gray-300 hover:bg-gray-50'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              
+              <button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Suivant
+              </button>
+            </div>
           )}
         </main>
       </div>
     </div>
   );
-};
-
-export default SolairePage;
+}
